@@ -46,7 +46,7 @@ export default function Home() {
           </div>
           <div>
             <Button className="border border-zinc-300 rounded text-zinc-600 hover:border-zinc-600 hover:text-zinc-600 transition ease-in-out">
-              API I Built for This
+              <Link href={"https://api.rchung.dev"}>API I Built for This</Link>
             </Button>
           </div>
         </div>
