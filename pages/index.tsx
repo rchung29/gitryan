@@ -57,32 +57,23 @@ export default function Home() {
               <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-zinc-600"></div>
             </div>
           ) : (
-            <ul className="space-y-4 overflow-auto">
+            <ul className="space-y-4 overflow-auto text-left">
               {repositories.map((repo, index) => (
-                <li key={index} className="">
-                  <Button className="w-full text-left border border-zinc-300 hover:border-zinc-600 text-zinc-600 py-6 rounded transition ease-in-out">
-                    <Link
-                      key={index}
-                      href={`/repos/${encodeURIComponent(repo)}`}
-                      className="w-full"
-                    >
-                      {repo}
-                    </Link>
-                  </Button>
-                </li>
+                <Link
+                  key={index}
+                  href={`/repos/${encodeURIComponent(repo)}`}
+                  className="w-full"
+                >
+                  <li key={index} className="border border-zinc-300 hover:border-zinc-600 text-zinc-600 my-4 rounded transition ease-in-out">
+                    <Button className="w-full text-left">
+                        {repo}
+                    </Button>
+                  </li>
+                </Link>
               ))}
             </ul>
           )}
         </div>
-      </div>
-      <div className="fixed bottom-2 left-2">
-        <Alert className="rounded bg-red-200">
-          <Terminal className="h-4 w-4 bg-red-500" />
-          <AlertTitle className="text-red-600">Heads up!</AlertTitle>
-          <AlertDescription className="text-red-400">
-            Not responsive yet. Use on desktop!
-          </AlertDescription>
-        </Alert>
       </div>
     </div>
   );

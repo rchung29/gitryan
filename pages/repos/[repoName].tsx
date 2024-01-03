@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { ArrowLeftToLine } from "lucide-react";
+import { ArrowLeftToLine, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
   FileText,
   Folder,
@@ -11,7 +11,7 @@ import {
 import { root } from "postcss";
 import { rootCertificates } from "tls";
 import { transcode } from "buffer";
-
+import { Switch } from "@/components/ui/switch";
 interface TreeData {
   files: string[];
 }
@@ -69,6 +69,10 @@ const RepoDetails = () => {
   const [openNodes, setOpenNodes] = useState<OpenNodesMap>({});
 
   const [selectedFileName, setSelectedFileName] = useState("");
+
+  const [showFileTree, setShowFileTree] = useState(true); // true for file tree, false for commit history
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // manage open/close state
+
 
   const router = useRouter();
   const { repoName = "" } = router.query; // Default to an empty string if undefined
@@ -289,7 +293,6 @@ const RepoDetails = () => {
   const CodeDisplay: React.FC<CodeDisplayProps> = ({ content }) => {
     return (
       <div className="bg-zinc-50 overflow-y-auto">
-        (
         <div style={{ whiteSpace: "pre-wrap" }} className="text-zinc-400">
           {content.split("\n").map((line, index) => (
             <span key={index}>
@@ -298,39 +301,67 @@ const RepoDetails = () => {
             </span>
           ))}
         </div>
-        )
       </div>
     );
   };
 
   return (
     <div className="flex h-screen">
-      <div className="flex flex-col w-1/4 h-screen bg-zinc-50 border-r border-1 p-6 border-zinc-300">
+      {/* Collapsed Sidebar (Icon Button) */}
+      <div className={`sm:hidden ${isSidebarOpen ? 'hidden' : 'flex'} flex-col items-center w-12 h-screen bg-zinc-50 border-r border-zinc-300 p-6`}>
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          <PanelLeftOpen height={20} width={20} />
+        </button>
+      </div>
+
+      {/* Expanded Sidebar */}
+      <div className={`flex flex-col ${isSidebarOpen ? 'w-full' : 'hidden'} h-screen bg-zinc-50 border-r border-zinc-300 p-6 transition-all duration-300 overflow-y-auto sm:w-1/4 sm:block`}>
+        <div className="flex flex-row justify-between items-center">
         <Link
           href="/"
-          className="text-zinc-500 text-md flex items-center hover:text-zinc-700 transition ease-in-out"
+          className="text-zinc-500 text-md flex items-center hover:text-zinc-700 transition ease-in-out mb-1"
         >
           <ArrowLeftToLine height={15} width={15} className="mr-1" />
           Go Back
         </Link>
-        <h1 className="text-3xl font-semibold mb-4 text-zinc-600">
+        <button
+          onClick={() => setIsSidebarOpen(false)}
+          className="bg-red-500 text-white p-2 rounded mb-4 w-9 md:hidden"
+        >
+          <PanelLeftClose height={20} width={20} />
+        </button>
+        </div>
+        <h1 className="text-3xl font-semibold mb-2 text-zinc-600 mb-4">
           {repoName}
         </h1>
-        <FileTree
-          data={repoTree}
-          onFileClick={handleFileClick}
-          openNodes={openNodes}
+        <div className="flex flex-row space-x-2">
+        <Switch
+          checked={showFileTree}
+          onCheckedChange={() => setShowFileTree(!showFileTree)}
+          className="mb-4"
         />
+        <p className="text-zinc-500 font-bold">Show Commit History</p>
+        </div>
+        {showFileTree ? (
+          <FileTree
+            data={repoTree}
+            onFileClick={handleFileClick}
+            openNodes={openNodes}
+          />
+        ) : (
+          <CommitHistory commits={commitHist} />
+        )}
       </div>
-      <div className="flex flex-col w-1/4 h-screen bg-zinc-50 border-r border-1 p-6 border-zinc-300 overflow-y-auto">
-        <CommitHistory commits={commitHist} />
-      </div>
+
+      {/* Main Content Area */}
       <div className="flex-1 p-6 overflow-y-auto bg-zinc-50">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold text-zinc-600">
             {selectedFileName}
           </h2>
-          )
         </div>
         <CodeDisplay content={fileContent} />
       </div>
